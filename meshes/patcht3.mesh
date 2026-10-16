@@ -1,0 +1,19 @@
+# n_nodes n_elements dim
+7 6 2
+
+# node_number x y
+1 0.0000 0.0000
+2 100.0000 0.0000
+3 100.0000 100.0000
+4 39.3450 42.4735
+5 0.0000 100.0000
+6 50.0000 0.0000
+7 100.0000 50.0000
+
+# element_number element_type connectivity
+1 TRI3 1 6 4
+2 TRI3 6 2 4
+3 TRI3 2 7 4
+4 TRI3 7 3 4
+5 TRI3 3 5 4
+6 TRI3 5 1 4

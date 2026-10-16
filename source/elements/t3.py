@@ -1,6 +1,9 @@
 import numpy as np
 
 class T3:
+    dofs_per_node = 2
+    n_nodes = 3    
+    
     def __init__(self, global_id, node_global_ids, mesh, material, thickness=1.0):
         self.global_id = global_id
         self.node_global_ids = node_global_ids  # Lista con los IDs globales de los 3 nodos

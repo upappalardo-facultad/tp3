@@ -1,6 +1,9 @@
 import numpy as np
 
 class T6:
+    dofs_per_node = 2
+    n_nodes = 6        
+    
     def __init__(self, global_id, node_global_ids, mesh, material, thickness=1.0):
         self.global_id = global_id
         self.node_global_ids = node_global_ids  # Lista con los IDs globales de los 6 nodos
@@ -79,7 +82,7 @@ class T6:
 
     def stiffness_matrix(self):
         """Integra Ke (12x12) para T6 usando 3 puntos de Gauss triangulares."""
-        D = self.material.D_matrix()
+        C = self.material.C_matrix()
         Ke = np.zeros((12, 12))
 
         # Puntos de integracion de Gauss para triangulo (3 puntos)
@@ -93,7 +96,7 @@ class T6:
         for xi_g, eta_g in gauss_pts:
             B, detJ = self.B_matrix(xi_g, eta_g)
             weight_total = w_g * detJ * self.thickness
-            Ke += B.T @ D @ B * weight_total
+            Ke += B.T @ C @ B * weight_total
 
         return Ke
 
