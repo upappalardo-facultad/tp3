@@ -12,31 +12,37 @@ from source.output.paraview import write_results
 from source.postprocessing.element_stresses import compute_element_stresses
 
 # ==============================================================================
-# 1. PARÁMETROS DEL PROYECTO
+# 1. PARÁMETROS OFICIALES DE LA CÁTEDRA (EN UNIDADES S.I. - METROS, PASCALES, KG)
 # ==============================================================================
-E = 30e9              # Módulo de Elasticidad [Pa] (30 GPa)
+E = 21e9              # Módulo de Elasticidad: 21 GPa = 21e9 Pa
 nu = 0.20             # Coeficiente de Poisson
 rho_concrete = 2400.0 # Densidad del hormigón [kg/m3]
 g = 9.81              # Gravitación [m/s2]
-thickness = 1.0       # Espesor unitario [m]
+thickness = 1.0       # Espesor unitario para estado plano [m]
 
 rho_water = 1000.0    # Densidad del agua [kg/m3]
-water_level = 100.0   # Cota del agua [m]
+height_dam = 30.0     # Altura total de la presa [m]
+borde_libre = 2.0     # Borde libre d = 2m
+water_level = height_dam - borde_libre  # Cota del agua = 28.0 m
 
-# Estado plano según requerimiento explícito de la cátedra
-PLANE_STATE = "plane_strain"
+PLANE_STATE = "plane_strain"  # Estado Plano de Deformación
 
 # ==============================================================================
-# 2. CARGA DE MALLA (SOPORTA Q4, T3, Q8, T6 O MIXTAS)
+# 2. CARGA DE MALLA Y CONVERSIÓN DE MILÍMETROS A METROS
 # ==============================================================================
 mesh = Mesh()
-mesh.read("tp3/meshes/presa_q4t6_1824.mesh")
+mesh.read("tp3/meshes/presa_cos_q8t6.mesh") #tp3/meshes/presa_q4t3_cos.mesh asi funnciona el 14t3
 mesh.dofs_per_node = 2
+
+# CONVERSIÓN A METROS: 
+for node in mesh.nodes:
+        node.x /= 1000.0
+        node.y /= 1000.0
 
 material = LinearElastic(E=E, nu=nu)
 
 # ==============================================================================
-# 3. INSTANCIACIÓN UNIVERSAL DE ELEMENTOS
+# 3. INSTANCIACIÓN DE ELEMENTOS
 # ==============================================================================
 elements = []
 for e in range(mesh.number_of_elements()):
@@ -53,7 +59,7 @@ for e in range(mesh.number_of_elements()):
     elif elem_type in ["T6", "TRI6", "CTRIA6", "LST", "CPLSTN6"]:
         element = T6(global_id, connectivity, mesh, material, thickness)
     else:
-        raise ValueError(f"Tipo de elemento {elem_type} no reconocido en la malla.")
+        raise ValueError(f"Tipo de elemento {elem_type} no reconocido.")
 
     elements.append(element)
 
@@ -62,19 +68,17 @@ K = DenseMatrix(num_dofs)
 f = np.zeros(num_dofs)
 
 # ==============================================================================
-# 4. ENSAMBLADO DE K Y CARGA DE PESO PROPIO
+# 4. ENSAMBLADO DE K Y CARGA DE PESO PROPIO (GRAVEDAD)
 # ==============================================================================
 for element in elements:
     K.scatter_local_to_global(element)
 
-    # Peso propio distribuido proporcionalmente en los nodos del elemento
     n_elem_nodes = len(element.node_global_ids)
-    
-    # Cálculo aproximado del área
     coords = np.array([[mesh.nodes[nid].x, mesh.nodes[nid].y] for nid in element.node_global_ids])
-    if n_elem_nodes in [3, 6]:  # Elementos triangulares T3 / T6
+    
+    if n_elem_nodes in [3, 6]:  # T3 / T6
         area = 0.5 * np.abs(np.cross(coords[1]-coords[0], coords[2]-coords[0]))
-    else:  # Elementos cuadriláteros Q4 / Q8
+    else:  # Q4 / Q8
         area = 0.5 * np.abs(np.cross(coords[2]-coords[0], coords[3]-coords[1]))
 
     element_weight = area * thickness * rho_concrete * g
@@ -85,12 +89,12 @@ for element in elements:
         f[dofs[1]] += force_per_node_y
 
 # ==============================================================================
-# 5. CARGA HIDROSTÁTICA DEL AGUA (x ≈ 0, y <= water_level)
+# 5. CARGA HIDROSTÁTICA DEL AGUA (x ≈ 0, y <= 28.0 m)
 # ==============================================================================
 upstream_nodes = []
 for nid in range(mesh.number_of_nodes()):
     node = mesh.node(nid)
-    if np.isclose(node.x, 0.0) and node.y <= water_level:
+    if np.isclose(node.x, 0.0) and node.y <= water_level + 1e-3:
         upstream_nodes.append((nid, node.y))
 
 upstream_nodes.sort(key=lambda item: item[1])
@@ -112,7 +116,7 @@ for i in range(len(upstream_nodes) - 1):
     f[dofs2[0]] += F_segment / 2.0
 
 # ==============================================================================
-# 6. CONDICIONES DE BORDE (EMPOTRAMIENTO BASE y = 0)
+# 6. CONDICIONES DE BORDE (EMPOTRAMIENTO EN LA BASE y = 0.0 m)
 # ==============================================================================
 for nid in range(mesh.number_of_nodes()):
     node = mesh.node(nid)
@@ -133,10 +137,11 @@ print("¡Sistema resuelto exitosamente!")
 # ==============================================================================
 stresses = compute_element_stresses(mesh, elements, u, plane_state=PLANE_STATE)
 
-output_vtu = "tp3/results/dam_q4t3_resultsvfull.vtu"
+output_vtu = "tp3/results/presa_q8t6_cos.vtu" #tp3/results/presa_q4t3_cos_corregido.vtu asi funciona el q4t3
 write_results(output_vtu, mesh, elements, u, stresses=stresses)
 
-print(f"=== RESULTADOS DE LA SIMULACIÓN DE LA PRESA ===")
-print(f"Desplazamiento horizontal máx (Ux) : {np.max(u[0::2]):.6e} m")
-print(f"Desplazamiento vertical máx   (Uy) : {np.min(u[1::2]):.6e} m")
+print(f"\n=== RESULTADOS CORREGIDOS DE LA PRESA (METROS Y PASCALES) ===")
+print(f"Desplazamiento horizontal máx (Ux) : {np.max(u[0::2]) * 1000.0:.4f} mm")
+print(f"Desplazamiento vertical máx   (Uy) : {np.min(u[1::2]) * 1000.0:.4f} mm")
+print(f"Tensión Von Mises Máxima            : {np.max(stresses['von_mises']) / 1e6:.2f} MPa")
 print(f"Archivo generado para ParaView     : {output_vtu}")
