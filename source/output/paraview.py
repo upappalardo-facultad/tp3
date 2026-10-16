@@ -1,78 +1,67 @@
-import os
 import meshio
+import numpy as np
 
-
-def element_cells(mesh):
+def write_results(filename, mesh, elements, u, stresses=None):
     """
-    Convierte la conectividad de la malla al formato de celdas de meshio
-    soportando Q4 ('quad'), T3 ('triangle'), Q8 ('quad8') y T6 ('triangle6').
+    Exporta resultados de desplazamientos y tensiones a formato .vtu de ParaView.
+    Soporta mallas mixtas (múltiples bloques de elementos en meshio).
     """
-    quads = []
-    triangles = []
-    quads8 = []
-    triangles6 = []
+    # 1. Coordenadas de los nodos
+    points = np.array([[node.x, node.y, 0.0] for node in mesh.nodes])
+    
+    # 2. Desplazamientos nodales (3D para VTK)
+    displacement = np.zeros((mesh.number_of_nodes(), 3))
+    for i in range(mesh.number_of_nodes()):
+        dofs = mesh.node_global_dofs(i)
+        displacement[i, 0] = u[dofs[0]]
+        displacement[i, 1] = u[dofs[1]]
 
+    # 3. Estructuración de celdas por tipo de elemento
+    cells_dict = {}
+    
     for i, connectivity in enumerate(mesh.connectivity):
         elem_type = mesh.element_types[i]
         
-        # mesh.connectivity YA VIENE en base 0 desde mesh.py. NO restar 1.
-        conn = connectivity 
+        if elem_type in ["Q4", "QUAD4", "CQUAD4", "CPLSTN4"]:
+            key = "quad"
+        elif elem_type in ["T3", "TRI3", "CTRIA3", "CPLSTN3"]:
+            key = "triangle"
+        elif elem_type in ["Q8", "QUAD8", "CQUAD8", "CPLSTN8"]:
+            key = "quad8"
+        elif elem_type in ["T6", "TRI6", "CTRIA6", "LST", "CPLSTN6"]:
+            key = "triangle6"
+        else:
+            continue
+
+        if key not in cells_dict:
+            cells_dict[key] = []
         
-        # Elementos lineales (1er Orden)
-        if elem_type in ["Q4", "QUAD4", "CQUAD4", "CPLSTN4", "CPLSTS4"]:
-            quads.append(conn)
-        elif elem_type in ["T3", "TRI3", "CTRIA3", "CPLSTN3", "CPLSTS3"]:
-            triangles.append(conn)
-            
-        # Elementos cuadráticos (2do Orden)
-        elif elem_type in ["Q8", "QUAD8", "CQUAD8", "CPLSTN8", "CPLSTS8"]:
-            quads8.append(conn)
-        elif elem_type in ["T6", "TRI6", "CTRIA6", "LST", "CPLSTN6", "CPLSTS6"]:
-            triangles6.append(conn)
+        # Conectividad en base 0
+        cells_dict[key].append(connectivity)
 
-    cells = []
-    if quads:
-        cells.append(("quad", quads))
-    if triangles:
-        cells.append(("triangle", triangles))
-    if quads8:
-        cells.append(("quad8", quads8))
-    if triangles6:
-        cells.append(("triangle6", triangles6))
+    cells = [(key, cells_dict[key]) for key in cells_dict]
 
-    return cells
-
-def write(filename, points, cells, displacement, stresses=None):
-    directory = os.path.dirname(filename)
-
-    if directory != "":
-        os.makedirs(directory, exist_ok=True)
-
+    # 4. Asignación de datos por celdas (Cell Data) por bloque
     cell_data = {}
     if stresses is not None:
-        # Registra cada componente del diccionario de tensiones (sig_xx, sig_yy, tau_xy, von_mises)
-        for key, value in stresses.items():
-            cell_data[key] = [value]
+        # Preparamos las listas por componente para cada bloque de celdas
+        for field in ["sig_xx", "sig_yy", "tau_xy", "von_mises"]:
+            if field in stresses:
+                cell_data[field] = []
+                
+                # Recorremos cada bloque de celdas para agrupar sus tensiones asociadas
+                elem_offset = 0
+                for key, elem_list in cells:
+                    n_elem_in_block = len(elem_list)
+                    block_stresses = stresses[field][elem_offset : elem_offset + n_elem_in_block]
+                    cell_data[field].append(block_stresses)
+                    elem_offset += n_elem_in_block
 
+    # 5. Crear e escribir la malla en formato VTU
     output_mesh = meshio.Mesh(
         points=points,
         cells=cells,
         point_data={"displacement": displacement},
-        cell_data=cell_data,
+        cell_data=cell_data
     )
-
     output_mesh.write(filename)
-
-
-def write_results(filename, mesh, elements, u, stresses=None):
-    points = []
-    displacement = []
-
-    for node in mesh.nodes:
-        dofs = mesh.node_global_dofs(node.global_id)
-
-        points.append([node.x, node.y, 0.0])
-        displacement.append([u[dofs[0]], u[dofs[1]], 0.0])
-
-    cells = element_cells(mesh)
-    write(filename, points, cells, displacement, stresses)
