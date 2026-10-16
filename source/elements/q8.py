@@ -1,6 +1,9 @@
 import numpy as np
 
 class Q8:
+    dofs_per_node = 2
+    n_nodes = 8    
+    
     def __init__(self, global_id, node_global_ids, mesh, material, thickness=1.0):
         self.global_id = global_id
         self.node_global_ids = node_global_ids  # Lista con los IDs globales de los 8 nodos
@@ -80,7 +83,7 @@ class Q8:
 
     def stiffness_matrix(self):
         """Integra Ke (16x16) usando Cuadratura de Gauss 2x2."""
-        D = self.material.D_matrix()
+        C = self.material.C_matrix()
         Ke = np.zeros((16, 16))
 
         p = 1.0 / np.sqrt(3.0)
@@ -91,7 +94,7 @@ class Q8:
             for eta, w_eta in zip(gauss_points, weights):
                 B, detJ = self.B_matrix(xi, eta)
                 weight_total = w_xi * w_eta * detJ * self.thickness
-                Ke += B.T @ D @ B * weight_total
+                Ke += B.T @ C @ B * weight_total
 
         return Ke
 

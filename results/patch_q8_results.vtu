@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+<!--This file was created by meshio v5.3.5-->
+<UnstructuredGrid>
+<Piece NumberOfPoints="20" NumberOfCells="5">
+<Points>
+<DataArray type="Float64" Name="Points" NumberOfComponents="3" format="binary">
+AQAAAACAAADgAQAA+QAAAA==eJxjYEACDvkOMKaJoJnN3k9aDj8Nn61TfVMIF484ZXRk4ztdBybtdrGbNllw8f+bqj9tKLBx+NwXXKJyNc+BAQV4QvmZ2MUPFMHFy/zlxLJkvRzWZt4r7OLLgYs/Pj5j97QTXg7fnyQuvHavAC7+dp6NzpWwYIeVS/wchL8j7C0413Hp3oVQh9V24dEbLyLcWXthc+TX1jAHsHs3IfwFAZEO6OGAApDciQoQ/soNq1237ZOVw8fkM7HeEgjzJ/JXma1+ZwtxT2U2dnsxwgcqjmTvgzmCS/cuDHJYPyW1I3kxInzci37yv+QOcfiXCgyhpYjwAQDTyGnD
+</DataArray>
+</Points>
+<Cells>
+<DataArray type="Int32" Name="connectivity" format="binary">
+AQAAAACAAACgAAAASgAAAA==eJwtjFsSgCAQw1bwgYoieP+72o7Zmfxs2taIuEQTd/yXRBYTP7shXv6rKGITXVRy9gs9u4Pth753ZrGzkXCdrjMnvULuA4O0Aas=
+</DataArray>
+<DataArray type="Int32" Name="offsets" format="binary">
+AQAAAACAAAAUAAAAFgAAAA==eJzjYGBgEABiCSBWAGINIAYABHQAeQ==
+</DataArray>
+<DataArray type="Int32" Name="types" format="binary">
+AQAAAACAAAAUAAAADgAAAA==eJwTZ2BgEEfDAAV4AHQ=
+</DataArray>
+</Cells>
+<PointData>
+<DataArray type="Float64" Name="displacement" NumberOfComponents="3" format="binary">
+AQAAAACAAADgAQAAUgEAAA==eJwL49PdNPf99f3TnLtznv9+bM8ABQa9BUtq997cr5/5Y7dM9HO4+P5bszX3aV/an2wZbOTl+BAunv9u3qd5Py/vP10p4FO/4Alc3HXb579XKk7u17+rwtY4FaF+T8lkCZawa1Dxl3DxRef5dqybcXb/puO/9syYg3DPHAPx5QL/Lu3fG/Z87zUvhHuEQ/4rTFp4ev+iJRf1Prg9g4sXXDiVxL7r0P6m7DMTzn9AmLOU7WuHju75/W/XH7a1bkXYK9R84NRC12P7T5btmy+ljzBf+fbPuqw9d6DhgxDvdEx4ekHp8n7tdrGb577fh4sLXlm2YOK+a/unr9x6NXAXwj1ake2LV5tc3P+1x9hmTdsjuPiHS75JAhE7ofYi3LlGJirF+v55qPhruPhasb5r7CdO7LeWFeJo3YQI5wAp/mj56nP77zFLLou+jXAnAAuor8I=
+</DataArray>
+</PointData>
+<CellData>
+<DataArray type="Float64" Name="sig_xx" format="binary">
+AQAAAACAAAAoAAAAGAAAAA==eJwTL0sKj3tw0lERjdaF0nZQGgBmqxIY
+</DataArray>
+<DataArray type="Float64" Name="sig_yy" format="binary">
+AQAAAACAAAAoAAAAGAAAAA==eJyzfnNk3zSPM46BUNoGje8KpQHfLhcc
+</DataArray>
+<DataArray type="Float64" Name="tau_xy" format="binary">
+AQAAAACAAAAoAAAAHAAAAA==eJyT2yhsfdix+WAOlFaG0jc2QOgvUBoAbQcS2w==
+</DataArray>
+<DataArray type="Float64" Name="von_mises" format="binary">
+AQAAAACAAAAoAAAAGwAAAA==eJxbyDS7fEfxNsetUHoJlF4PpVdCaQCMBBNh
+</DataArray>
+</CellData>
+</Piece>
+</UnstructuredGrid>
+</VTKFile>
