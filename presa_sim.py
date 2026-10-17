@@ -31,7 +31,10 @@ PLANE_STATE = "plane_strain"  # Estado Plano de Deformación
 # 2. CARGA DE MALLA Y CONVERSIÓN DE MILÍMETROS A METROS
 # ==============================================================================
 mesh = Mesh()
-mesh.read("tp3/meshes/presa_cos_q8t6.mesh") #tp3/meshes/presa_q4t3_cos.mesh asi funnciona el 14t3
+mesh.read("tp3/meshes/presa_opt.mesh") 
+#tp3/meshes/presa_cos_q8t6.mesh asi funciona el q8t6
+#tp3/meshes/presa_q4t3_cos.mesh asi funnciona el q4t3
+
 mesh.dofs_per_node = 2
 
 # CONVERSIÓN A METROS: 
@@ -137,7 +140,7 @@ print("¡Sistema resuelto exitosamente!")
 # ==============================================================================
 stresses = compute_element_stresses(mesh, elements, u, plane_state=PLANE_STATE)
 
-output_vtu = "tp3/results/presa_q8t6_cos.vtu" #tp3/results/presa_q4t3_cos_corregido.vtu asi funciona el q4t3
+output_vtu = "tp3/results/presa_opt.vtu" 
 write_results(output_vtu, mesh, elements, u, stresses=stresses)
 
 print(f"\n=== RESULTADOS CORREGIDOS DE LA PRESA (METROS Y PASCALES) ===")
