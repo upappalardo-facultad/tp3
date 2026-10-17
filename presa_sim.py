@@ -12,7 +12,7 @@ from source.output.paraview import write_results
 from source.postprocessing.element_stresses import compute_element_stresses
 
 # ==============================================================================
-# 1. PARÁMETROS OFICIALES DE LA CÁTEDRA (EN UNIDADES S.I. - METROS, PASCALES, KG)
+# 1. PARÁMETROS (EN UNIDADES S.I. - METROS, PASCALES, KG)
 # ==============================================================================
 E = 21e9              # Módulo de Elasticidad: 21 GPa = 21e9 Pa
 nu = 0.20             # Coeficiente de Poisson
