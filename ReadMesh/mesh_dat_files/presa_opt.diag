@@ -1,0 +1,48 @@
+
+*** 20:37:16 *** 
+Starting Nastran Exporter
+
+*** 20:37:16 *** 
+Writing file 
+C:\Users\mange\Documents\GitHub\ReadMesh\mesh_dat_files\presa_opt.dat
+ 
+*** 20:37:16 *** 
+Writing SIMCENTER NASTRAN 2412.0 compatible deck
+
+*** 20:37:16 *** 
+Writing Bulk Data section
+
+*** 20:37:16 *** 
+Writing Nodes
+
+*** 20:37:16 *** 
+Writing Elements
+
+*** 20:37:17 *** 
+Writing Physical Properties
+
+*** 20:37:17 *** 
+Writing Materials
+
+*** 20:37:17 *** 
+Writing Degree-of-Freedom Sets
+
+*** 20:37:17 *** 
+Writing Coordinate Systems
+
+*** 20:37:17 *** 
+Summary of Bulk Data cards written
+
++----------+----------+
+|   NAME   |  NUMBER  |
++----------+----------+
+| CQUAD8   | 1661     |
+| CTRIA6   | 659      |
+| GRID     | 6595     |
+| MAT1     | 1        |
+| PSHELL   | 2        |
++----------+----------+
+
+*** 20:37:17 *** 
+Nastran Deck Successfully Written
+
